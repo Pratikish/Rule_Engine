@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rule Engine UI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Rule Engine UI</h2>
+
+        <!-- Form for Creating a Rule -->
+        <div class="form-group">
+            <label for="rule">Create Rule (e.g., age > 30 AND department = 'Sales')</label>
+            <textarea id="rule" rows="3"></textarea>
+        </div>
+        <button onclick="createRule()">Create Rule</button>
+
+        <!-- Form for Evaluating Rule -->
+        <div class="form-group">
+            <label for="data">Evaluate Rule (JSON Data)</label>
+            <textarea id="data" rows="3">{
+                "age": 40,
+                "department": "Sales",
+                "salary": 60000,
+                "experience": 3
+            }</textarea>
+        </div>
+        <button onclick="evaluateRule()">Evaluate Rule</button>
+
+        <!-- Display Result -->
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        // URL of the API endpoint
+        const apiUrl = "http://localhost:8080/rules";
+
+        // Function to create a rule by sending a POST request
+        function createRule() {
+            const ruleString = document.getElementById('rule').value;
+
+            fetch(`${apiUrl}/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(ruleString)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').textContent = `Created Rule AST: ${JSON.stringify(data)}`;
+            })
+            .catch(error => {
+                document.getElementById('result').textContent = `Error: ${error}`;
+            });
+        }
+
+        // Function to evaluate a rule by sending a POST request
+        function evaluateRule() {
+            const jsonData = document.getElementById('data').value;
+
+            fetch(`${apiUrl}/evaluate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: jsonData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').textContent = `Evaluation Result: ${JSON.stringify(data)}`;
+            })
+            .catch(error => {
+                document.getElementById('result').textContent = `Error: ${error}`;
+            });
+        }
+    </script>
+</body>
+</html>
